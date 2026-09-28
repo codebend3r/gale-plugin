@@ -1,0 +1,23 @@
+id = "gale"
+name = "Gale"
+description = "Gale CSS linter diagnostics and quick fixes for CSS, SCSS, Less, and Sass."
+version = "0.7.0"
+schema_version = 1
+authors = ["CJ Rivas"]
+repository = "https://github.com/codebend3r/gale-plugin"
+
+[lib]
+kind = "Rust"
+version = "0.7.0"
+
+[language_servers.gale]
+name = "Gale"
+languages = ["CSS", "SCSS", "LESS", "SASS"]
+language_ids = { CSS = "css", SCSS = "scss", LESS = "less", SASS = "sass" }
+
+# Zed can't see files under gitignored folders like node_modules, so the
+# extension checks for the project's gale binary with `test -f <path>`.
+[[capabilities]]
+kind = "process:exec"
+command = "test"
+args = ["-f", "*"]

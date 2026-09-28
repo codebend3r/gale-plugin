@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*"],
+    "sharedTsConfig": [
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/eslint.config.mjs"
+    ]
+  },
+  "targetDefaults": {
+    "lint": {
+      "cache": true,
+      "inputs": ["default", "^default", "sharedTsConfig"]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["default", "^default", "sharedTsConfig"]
+    },
+    "test": {
+      "cache": true,
+      "inputs": ["default", "^default", "sharedTsConfig"],
+      "outputs": ["{projectRoot}/coverage"]
+    },
+    "build": {
+      "cache": true,
+      "inputs": ["default", "^default", "sharedTsConfig"]
+    }
+  },
+  "sync": {
+    "globalGenerators": ["@gale-plugin/codegen:sync"]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "generators": {
+    "sync": {
+      "factory": "./src/sync.ts",
+      "schema": "./src/schema.json",
+      "description": "Writes the shared Gale contract into each editor plugin's generated files."
+    }
+  }
+}

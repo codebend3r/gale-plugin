@@ -1,0 +1,5 @@
+# The extension is bundled by esbuild, so the .vsix needs only the bundle.
+**
+!dist/extension.js
+!README.md
+!LICENSE

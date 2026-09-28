@@ -1,0 +1,62 @@
+{
+  "name": "webstorm",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["contract"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "inputs": ["{projectRoot}/**/*"],
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew ktlintCheck --console=plain"
+      }
+    },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "parallelism": false,
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew ktlintFormat --console=plain"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "inputs": ["{projectRoot}/**/*"],
+      "outputs": ["{projectRoot}/build/reports/kover"],
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew test koverVerify --console=plain"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "inputs": ["{projectRoot}/**/*"],
+      "outputs": ["{projectRoot}/build/distributions"],
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew buildPlugin --console=plain"
+      }
+    },
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew installPlugin --console=plain"
+      }
+    },
+    "run-ide": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew runIde"
+      }
+    }
+  }
+}

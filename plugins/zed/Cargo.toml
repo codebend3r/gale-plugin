@@ -1,0 +1,15 @@
+[package]
+name = "gale-zed"
+version = "0.7.0"
+edition = "2024"
+publish = false
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+# An empty workspace table keeps this crate out of any parent workspace, which breaks Zed's build.
+[workspace]
+
+[dependencies]
+zed_extension_api = "0.7.0"

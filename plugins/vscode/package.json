@@ -1,0 +1,73 @@
+{
+  "name": "gale-lint",
+  "displayName": "Gale CSS Linter",
+  "description": "An extremely fast CSS linter, written in Rust",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "publisher": "gale",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codebend3r/gale-plugin"
+  },
+  "homepage": "https://github.com/codebend3r/gale-plugin",
+  "bugs": "https://github.com/codebend3r/gale-plugin/issues",
+  "categories": [
+    "Linters"
+  ],
+  "keywords": [
+    "css",
+    "scss",
+    "less",
+    "sass",
+    "linter"
+  ],
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
+    "onLanguage:sass"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Gale CSS Linter",
+      "properties": {
+        "gale.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the Gale linter."
+        },
+        "gale.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a Gale config file. Relative paths resolve from the workspace root. Leave empty to let Gale find one."
+        },
+        "gale.path": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the gale binary. Leave empty to use the project's @codebend3r/gale package, then PATH."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "gale.restart",
+        "title": "Gale: Restart Language Server"
+      }
+    ]
+  },
+  "dependencies": {
+    "@gale-plugin/contract": "workspace:*",
+    "vscode-languageclient": "10.1.2",
+    "which": "7.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "1.91.0",
+    "@types/which": "3.0.4",
+    "@vscode/vsce": "4.0.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "GaleCodegenSync",
+  "title": "Gale codegen sync",
+  "type": "object",
+  "properties": {}
+}

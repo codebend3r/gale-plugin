@@ -6,16 +6,56 @@ on:
   pull_request:
 
 jobs:
-  compile:
-    name: Compile
+  system-check:
+    name: System check
     runs-on: ubuntu-latest
+    env:
+      # Gradle downloads WebStorm instead of looking for a local install.
+      ORG_GRADLE_PROJECT_ideVersion: "2026.2.3"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
+      # Nx loads the TypeScript codegen plugin with Node's built-in type stripping.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
 
       - uses: oven-sh/setup-bun@v2
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-wasip2
+          components: clippy, rustfmt, llvm-tools-preview
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Install
         run: bun install --frozen-lockfile
 
-      - name: Compile
-        run: bun run compile
+      # The same steps, in the same order, as `bun system-check`.
+      - name: Generated files are current
+        run: bun run sync:check
+
+      - name: Format check
+        run: bun run format:check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun run test
+
+      - name: Build
+        run: bun run build
