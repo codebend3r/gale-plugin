@@ -111,14 +111,27 @@ gate. CI runs the same steps one at a time.
 | Step                                      | Command                | Fix command        |
 | ----------------------------------------- | ---------------------- | ------------------ |
 | Generated files current                   | `bun run sync:check`   | `bun run sync`     |
-| Formatting (Prettier)                     | `bun run format:check` | `bun run format`   |
-| Lint (ESLint, rustfmt and clippy, ktlint) | `bun run lint`         | `bun run lint:fix` |
+| Formatting (oxfmt)                        | `bun run format:check` | `bun run format`   |
+| Lint (oxlint, rustfmt and clippy, ktlint) | `bun run lint`         | `bun run lint:fix` |
 | Typecheck                                 | `bun run typecheck`    |                    |
 | Test                                      | `bun run test`         |                    |
 | Build                                     | `bun run build`        |                    |
 
 Use `bun run test` and `bun run build`, not `bun test` or `bun build`, which
 start Bun's own test runner and bundler.
+
+### Git hooks
+
+`bun install` installs two [Lefthook](https://lefthook.dev) hooks:
+
+- **pre-commit** runs [lint-staged](https://github.com/lint-staged/lint-staged)
+  to fix staged files: oxlint and oxfmt for TypeScript and JavaScript, oxfmt
+  for everything else it knows, `cargo fmt` for Rust, and ktlint for Kotlin. A
+  lint error it can't fix stops the commit.
+- **pre-push** runs `bun system-check`. Lefthook skips it when the branch has
+  nothing new to push.
+
+To skip a hook once, pass `--no-verify`.
 
 ## License
 

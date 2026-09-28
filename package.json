@@ -11,28 +11,29 @@
   "scripts": {
     "sync": "nx sync",
     "sync:check": "nx sync:check",
-    "format": "nx format:write --all",
-    "format:check": "nx format:check --all",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "lint": "nx run-many -t lint",
     "lint:fix": "nx run-many -t lint-fix",
     "typecheck": "nx run-many -t typecheck",
     "test": "nx run-many -t test",
     "build": "nx run-many -t build",
-    "system-check": "bun run sync:check && bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build"
+    "system-check": "bun run --sequential sync:check format:check lint typecheck test build"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
     "@nx/devkit": "23.2.1",
     "@nx/js": "23.2.1",
     "@nx/plugin": "23.2.1",
     "@types/node": "26.6.3",
     "@vitest/coverage-v8": "4.1.11",
     "esbuild": "0.28.2",
-    "eslint": "10.11.0",
+    "lefthook": "2.1.14",
+    "lint-staged": "17.6.0",
     "nx": "23.2.1",
-    "prettier": "3.9.9",
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0",
+    "oxlint-tsgolint": "7.0.2003",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.70.1",
     "vitest": "4.1.11"
   }
 }
