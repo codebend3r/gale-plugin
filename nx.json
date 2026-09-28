@@ -29,5 +29,6 @@
   },
   "sync": {
     "globalGenerators": ["@gale-plugin/codegen:sync"]
-  }
+  },
+  "analytics": true
 }
