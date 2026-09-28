@@ -11,8 +11,8 @@
   "scripts": {
     "sync": "nx sync",
     "sync:check": "nx sync:check",
-    "format": "nx format:write --all",
-    "format:check": "nx format:check --all",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "lint": "nx run-many -t lint",
     "lint:fix": "nx run-many -t lint-fix",
     "typecheck": "nx run-many -t typecheck",
@@ -32,7 +32,7 @@
     "lefthook": "2.1.14",
     "lint-staged": "17.6.0",
     "nx": "23.2.1",
-    "prettier": "3.9.9",
+    "oxfmt": "0.70.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.1",
     "vitest": "4.1.11"
