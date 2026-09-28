@@ -1,4 +1,18 @@
 node_modules/
-out/
+dist/
+coverage/
 *.vsix
 .DS_Store
+
+# Nx
+.nx/
+
+# Cargo
+plugins/zed/target/
+plugins/zed/extension.wasm
+
+# Gradle
+plugins/webstorm/build/
+plugins/webstorm/.gradle/
+plugins/webstorm/.intellijPlatform/
+plugins/webstorm/.kotlin/

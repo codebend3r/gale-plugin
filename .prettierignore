@@ -1,0 +1,9 @@
+bun.lock
+docs/
+**/dist/
+**/coverage/
+.nx/
+plugins/zed/target/
+plugins/webstorm/build/
+plugins/webstorm/.gradle/
+plugins/webstorm/.intellijPlatform/

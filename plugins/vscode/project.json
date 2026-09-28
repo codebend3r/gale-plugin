@@ -1,0 +1,40 @@
+{
+  "name": "vscode",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "plugins/vscode/src",
+  "projectType": "application",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint plugins/vscode" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p plugins/vscode/tsconfig.json" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --coverage", "cwd": "plugins/vscode" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "cwd": "plugins/vscode",
+        "parallel": false,
+        "commands": [
+          "esbuild src/extension.ts --bundle --platform=node --format=cjs --target=node20 --external:vscode --outfile=dist/extension.js",
+          "vsce package --no-dependencies --out dist/gale-lint.vsix"
+        ]
+      }
+    },
+    "install": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "cwd": "plugins/vscode",
+        "command": "code --install-extension dist/gale-lint.vsix --force"
+      }
+    }
+  }
+}

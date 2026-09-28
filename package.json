@@ -1,76 +1,28 @@
 {
-  "name": "gale-lint",
-  "displayName": "Gale CSS Linter",
-  "description": "An extremely fast CSS linter, written in Rust",
-  "version": "0.1.0",
+  "name": "gale-plugin",
+  "private": true,
   "license": "MIT",
-  "publisher": "gale",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/codebend3r/gale-plugin"
-  },
-  "homepage": "https://github.com/codebend3r/gale-plugin",
-  "bugs": "https://github.com/codebend3r/gale-plugin/issues",
-  "categories": [
-    "Linters"
+  "workspaces": [
+    "libs/*",
+    "tools/*",
+    "plugins/vscode"
   ],
-  "keywords": [
-    "css",
-    "scss",
-    "less",
-    "sass",
-    "linter"
-  ],
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "activationEvents": [
-    "onLanguage:css",
-    "onLanguage:scss",
-    "onLanguage:less",
-    "onLanguage:sass"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "configuration": {
-      "title": "Gale CSS Linter",
-      "properties": {
-        "gale.enable": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable or disable the Gale CSS linter."
-        },
-        "gale.configPath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to a Gale configuration file. If empty, Gale will auto-discover the config."
-        },
-        "gale.path": {
-          "type": "string",
-          "default": "",
-          "description": "Absolute path to the gale binary. If empty, Gale is looked up in node_modules/.bin, then on PATH."
-        }
-      }
-    },
-    "commands": [
-      {
-        "command": "gale.restart",
-        "title": "Gale: Restart Language Server"
-      }
-    ]
-  },
   "scripts": {
-    "compile": "tsc -p ./",
-    "package": "vsce package",
-    "vscode:prepublish": "bun run compile"
-  },
-  "dependencies": {
-    "vscode-languageclient": "9.0.1"
+    "system-check": "nx sync:check && nx format:check --all && nx run-many -t lint typecheck test build"
   },
   "devDependencies": {
-    "@types/node": "20.19.43",
-    "@types/vscode": "1.85.0",
-    "@vscode/vsce": "3.9.2",
-    "typescript": "5.9.3"
+    "@eslint/js": "10.0.1",
+    "@nx/devkit": "23.2.1",
+    "@nx/js": "23.2.1",
+    "@nx/plugin": "23.2.1",
+    "@types/node": "26.6.3",
+    "@vitest/coverage-v8": "4.1.11",
+    "esbuild": "0.28.2",
+    "eslint": "10.11.0",
+    "nx": "23.2.1",
+    "prettier": "3.9.9",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.1",
+    "vitest": "4.1.11"
   }
 }

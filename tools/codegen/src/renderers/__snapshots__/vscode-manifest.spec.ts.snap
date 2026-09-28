@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`vscodeManifest > renders the generated keys 1`] = `
+"{
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
+    "onLanguage:sass"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Gale CSS Linter",
+      "properties": {
+        "gale.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the Gale linter."
+        },
+        "gale.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a Gale config file. Relative paths resolve from the workspace root. Leave empty to let Gale find one."
+        },
+        "gale.path": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the gale binary. Leave empty to use the project's @codebend3r/gale package, then PATH."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "gale.restart",
+        "title": "Gale: Restart Language Server"
+      }
+    ]
+  }
+}
+"
+`;

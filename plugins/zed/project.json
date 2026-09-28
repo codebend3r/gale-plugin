@@ -1,0 +1,41 @@
+{
+  "name": "zed",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["contract"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["{projectRoot}/**/*"],
+      "options": {
+        "cwd": "plugins/zed",
+        "parallel": false,
+        "commands": [
+          "cargo fmt --check",
+          "cargo clippy --all-targets -- -D warnings"
+        ]
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["{projectRoot}/**/*"],
+      "outputs": [],
+      "options": {
+        "cwd": "plugins/zed",
+        "command": "cargo llvm-cov --ignore-filename-regex 'src/lib\\.rs$' --fail-under-lines 100 --fail-under-regions 100"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["{projectRoot}/**/*"],
+      "outputs": ["{projectRoot}/target/wasm32-wasip2/release/gale_zed.wasm"],
+      "options": {
+        "cwd": "plugins/zed",
+        "command": "cargo build --release --target wasm32-wasip2"
+      }
+    }
+  }
+}

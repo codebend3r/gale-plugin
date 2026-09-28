@@ -1,0 +1,32 @@
+<idea-plugin>
+    <id>com.codebend3r.gale</id>
+    <name>Gale CSS Linter</name>
+    <vendor url="https://github.com/codebend3r/gale-plugin">codebend3r</vendor>
+    <description><![CDATA[
+        Shows <a href="https://github.com/codebend3r/gale">Gale</a> diagnostics and quick fixes
+        for CSS, SCSS, Less, and Sass files.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lsp</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <platform.lsp.integrationProvider implementation="com.codebend3r.gale.ide.GaleLspIntegrationProvider"/>
+        <projectConfigurable
+            parentId="tools"
+            instance="com.codebend3r.gale.ide.GaleConfigurable"
+            id="com.codebend3r.gale.settings"
+            displayName="Gale"/>
+        <notificationGroup id="Gale" displayType="BALLOON"/>
+    </extensions>
+
+    <projectListeners>
+        <listener
+            class="com.codebend3r.gale.ide.GaleConfigFileListener"
+            topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </projectListeners>
+
+    <actions>
+        <action id="Gale.Restart" class="com.codebend3r.gale.ide.RestartGaleAction" text="Restart Gale"/>
+    </actions>
+</idea-plugin>
