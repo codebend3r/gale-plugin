@@ -18,7 +18,7 @@
     "typecheck": "nx run-many -t typecheck",
     "test": "nx run-many -t test",
     "build": "nx run-many -t build",
-    "system-check": "bun run sync:check && bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build"
+    "system-check": "bun run --sequential sync:check format:check lint typecheck test build"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -29,6 +29,8 @@
     "@vitest/coverage-v8": "4.1.11",
     "esbuild": "0.28.2",
     "eslint": "10.11.0",
+    "lefthook": "2.1.14",
+    "lint-staged": "17.6.0",
     "nx": "23.2.1",
     "prettier": "3.9.9",
     "typescript": "6.0.3",

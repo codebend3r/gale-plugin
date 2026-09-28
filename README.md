@@ -120,6 +120,19 @@ gate. CI runs the same steps one at a time.
 Use `bun run test` and `bun run build`, not `bun test` or `bun build`, which
 start Bun's own test runner and bundler.
 
+### Git hooks
+
+`bun install` installs two [Lefthook](https://lefthook.dev) hooks:
+
+- **pre-commit** runs [lint-staged](https://github.com/lint-staged/lint-staged)
+  to fix staged files: ESLint and Prettier for TypeScript and JavaScript,
+  Prettier for everything else, `cargo fmt` for Rust, and ktlint for Kotlin. A
+  lint error it can't fix stops the commit.
+- **pre-push** runs `bun system-check`. Lefthook skips it when the branch has
+  nothing new to push.
+
+To skip a hook once, pass `--no-verify`.
+
 ## License
 
 MIT
