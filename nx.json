@@ -5,7 +5,7 @@
     "default": ["{projectRoot}/**/*"],
     "sharedTsConfig": [
       "{workspaceRoot}/tsconfig.base.json",
-      "{workspaceRoot}/eslint.config.mjs"
+      "{workspaceRoot}/.oxlintrc.json"
     ]
   },
   "targetDefaults": {

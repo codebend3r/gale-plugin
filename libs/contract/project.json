@@ -7,13 +7,13 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint libs/contract"
+        "command": "oxlint libs/contract"
       }
     },
     "lint-fix": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --fix libs/contract"
+        "command": "oxlint --fix libs/contract"
       }
     },
     "typecheck": {

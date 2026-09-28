@@ -7,13 +7,13 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint plugins/vscode"
+        "command": "oxlint plugins/vscode"
       }
     },
     "lint-fix": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --fix plugins/vscode"
+        "command": "oxlint --fix plugins/vscode"
       }
     },
     "typecheck": {
