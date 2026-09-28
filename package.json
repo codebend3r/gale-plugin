@@ -1,5 +1,6 @@
 {
   "name": "gale-plugin",
+  "version": "0.0.0",
   "private": true,
   "license": "MIT",
   "workspaces": [
@@ -8,7 +9,16 @@
     "plugins/vscode"
   ],
   "scripts": {
-    "system-check": "nx sync:check && nx format:check --all && nx run-many -t lint typecheck test build"
+    "sync": "nx sync",
+    "sync:check": "nx sync:check",
+    "format": "nx format:write --all",
+    "format:check": "nx format:check --all",
+    "lint": "nx run-many -t lint",
+    "lint:fix": "nx run-many -t lint-fix",
+    "typecheck": "nx run-many -t typecheck",
+    "test": "nx run-many -t test",
+    "build": "nx run-many -t build",
+    "system-check": "bun run sync:check && bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

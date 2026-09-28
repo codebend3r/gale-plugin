@@ -6,15 +6,28 @@
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
-      "options": { "command": "eslint plugins/vscode" }
+      "options": {
+        "command": "eslint plugins/vscode"
+      }
+    },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --fix plugins/vscode"
+      }
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc -p plugins/vscode/tsconfig.json" }
+      "options": {
+        "command": "tsc -p plugins/vscode/tsconfig.json"
+      }
     },
     "test": {
       "executor": "nx:run-commands",
-      "options": { "command": "vitest run --coverage", "cwd": "plugins/vscode" }
+      "options": {
+        "command": "vitest run --coverage",
+        "cwd": "plugins/vscode"
+      }
     },
     "build": {
       "executor": "nx:run-commands",

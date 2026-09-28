@@ -14,6 +14,14 @@
         "command": "./gradlew ktlintCheck --console=plain"
       }
     },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "parallelism": false,
+      "options": {
+        "cwd": "plugins/webstorm",
+        "command": "./gradlew ktlintFormat --console=plain"
+      }
+    },
     "test": {
       "executor": "nx:run-commands",
       "cache": true,

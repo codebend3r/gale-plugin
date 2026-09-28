@@ -6,15 +6,28 @@
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
-      "options": { "command": "eslint tools/codegen" }
+      "options": {
+        "command": "eslint tools/codegen"
+      }
+    },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --fix tools/codegen"
+      }
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc -p tools/codegen/tsconfig.json" }
+      "options": {
+        "command": "tsc -p tools/codegen/tsconfig.json"
+      }
     },
     "test": {
       "executor": "nx:run-commands",
-      "options": { "command": "vitest run --coverage", "cwd": "tools/codegen" }
+      "options": {
+        "command": "vitest run --coverage",
+        "cwd": "tools/codegen"
+      }
     }
   }
 }

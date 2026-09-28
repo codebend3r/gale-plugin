@@ -105,9 +105,20 @@ installed `/Applications/WebStorm.app`; pass `-PidePath=...` to use another, or
 bun system-check
 ```
 
-This checks that generated files are current, checks formatting, then lints,
-type-checks, tests, and builds every plugin. Every test target enforces a 100%
-coverage gate. CI runs the same command.
+This runs every step below in order. Every test target enforces a 100% coverage
+gate. CI runs the same steps one at a time.
+
+| Step                                      | Command                | Fix command        |
+| ----------------------------------------- | ---------------------- | ------------------ |
+| Generated files current                   | `bun run sync:check`   | `bun run sync`     |
+| Formatting (Prettier)                     | `bun run format:check` | `bun run format`   |
+| Lint (ESLint, rustfmt and clippy, ktlint) | `bun run lint`         | `bun run lint:fix` |
+| Typecheck                                 | `bun run typecheck`    |                    |
+| Test                                      | `bun run test`         |                    |
+| Build                                     | `bun run build`        |                    |
+
+Use `bun run test` and `bun run build`, not `bun test` or `bun build`, which
+start Bun's own test runner and bundler.
 
 ## License
 

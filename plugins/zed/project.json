@@ -17,6 +17,17 @@
         ]
       }
     },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "plugins/zed",
+        "parallel": false,
+        "commands": [
+          "cargo clippy --fix --allow-dirty --allow-staged --all-targets",
+          "cargo fmt"
+        ]
+      }
+    },
     "test": {
       "executor": "nx:run-commands",
       "cache": true,

@@ -6,15 +6,28 @@
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
-      "options": { "command": "eslint libs/contract" }
+      "options": {
+        "command": "eslint libs/contract"
+      }
+    },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --fix libs/contract"
+      }
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc -p libs/contract/tsconfig.json" }
+      "options": {
+        "command": "tsc -p libs/contract/tsconfig.json"
+      }
     },
     "test": {
       "executor": "nx:run-commands",
-      "options": { "command": "vitest run --coverage", "cwd": "libs/contract" }
+      "options": {
+        "command": "vitest run --coverage",
+        "cwd": "libs/contract"
+      }
     }
   }
 }

@@ -41,5 +41,21 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
-      - name: System check
-        run: bun system-check
+      # The same steps, in the same order, as `bun system-check`.
+      - name: Generated files are current
+        run: bun run sync:check
+
+      - name: Format check
+        run: bun run format:check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun run test
+
+      - name: Build
+        run: bun run build
