@@ -75,8 +75,4 @@ class GaleTest : GaleTestCase() {
     fun testRestartingWithNoRunningClientDoesNothing() {
         restartGale(project)
     }
-
-    fun testOpensGalesSettingsPage() {
-        openGaleSettings(project)
-    }
 }

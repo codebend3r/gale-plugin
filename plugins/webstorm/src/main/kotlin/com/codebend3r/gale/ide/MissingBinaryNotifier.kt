@@ -4,7 +4,6 @@ import com.codebend3r.gale.generated.GaleFacts
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 
@@ -26,8 +25,4 @@ class MissingBinaryNotifier(
             .addAction(NotificationAction.createSimpleExpiring("Open settings") { openSettings(project) })
             .notify(project)
     }
-}
-
-fun openGaleSettings(project: Project) {
-    ShowSettingsUtil.getInstance().showSettingsDialog(project, GaleConfigurable::class.java)
 }

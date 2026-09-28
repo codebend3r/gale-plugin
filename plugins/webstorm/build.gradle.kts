@@ -50,8 +50,20 @@ intellijPlatform {
     buildSearchableOptions = false
 }
 
+tasks.test {
+    // CI has no display. Run headless everywhere so a test that needs one fails locally too.
+    systemProperty("java.awt.headless", "true")
+}
+
 kover {
     reports {
+        filters {
+            excludes {
+                // openGaleSettings opens the modal Settings dialog, which throws
+                // HeadlessException without a display, so no headless test can run it.
+                classes("com.codebend3r.gale.ide.OpenGaleSettingsKt")
+            }
+        }
         verify {
             rule {
                 bound {
