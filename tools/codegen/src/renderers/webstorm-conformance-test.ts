@@ -1,5 +1,6 @@
 import {
   binaryFileNameCases,
+  projectBinaryPathCases,
   resolveBinaryCases,
   rustTargetCases,
   serverArgsCases,
@@ -8,7 +9,6 @@ import {
   type PathSettings,
   type Platform,
   type Probe,
-  type Resolution,
 } from "@gale-plugin/contract";
 import type { Output } from "../output.ts";
 import { GENERATED_HEADER, kotlinString, testName } from "./kotlin.ts";
@@ -22,9 +22,10 @@ export const webstormConformanceTest: Output = {
     const tests = [
       ...rustTargetCases.map((testCase) =>
         test(testName("rust target", testCase.name), [
-          testCase.expected === null
-            ? `assertNull(rustTarget(${platformExpr(testCase.input)}))`
-            : `assertEquals(${kotlinString(testCase.expected)}, rustTarget(${platformExpr(testCase.input)}))`,
+          assertNullable(
+            testCase.expected,
+            `rustTarget(${platformExpr(testCase.input)})`,
+          ),
         ]),
       ),
       ...binaryFileNameCases.map((testCase) =>
@@ -32,16 +33,23 @@ export const webstormConformanceTest: Output = {
           `assertEquals(${kotlinString(testCase.expected)}, binaryFileName(${osExpr(testCase.input)}))`,
         ]),
       ),
+      ...projectBinaryPathCases.map((testCase) =>
+        test(testName("project binary path", testCase.name), [
+          `val platform = ${platformExpr(testCase.input.platform)}`,
+          ...assertNullablePath(
+            testCase.expected,
+            `projectBinaryPath(${kotlinNullable(testCase.input.root)}, platform)`,
+          ),
+        ]),
+      ),
       ...resolveBinaryCases.map((testCase) =>
         test(testName("resolve binary", testCase.name), [
           settingsLine(testCase.input.settings),
-          testCase.input.root === null
-            ? "val root: String? = null"
-            : `val root = ${kotlinString(testCase.input.root)}`,
-          `val platform = ${platformExpr(testCase.input.platform)}`,
           probeLine(testCase.input.probe),
-          ...expectedLines(testCase.expected),
-          "assertEquals(expected, resolveBinary(settings, root, platform, probe))",
+          ...assertNullablePath(
+            testCase.expected,
+            "resolveBinary(settings, probe)",
+          ),
         ]),
       ),
       ...serverArgsCases.map((testCase) =>
@@ -86,6 +94,30 @@ function test(name: string, body: readonly string[]): string {
   ].join("\n");
 }
 
+/** `assertNull(actual)` or `assertEquals("expected", actual)`. */
+function assertNullable(expected: string | null, actual: string): string {
+  return expected === null
+    ? `assertNull(${actual})`
+    : `assertEquals(${kotlinString(expected)}, ${actual})`;
+}
+
+/**
+ * Like `assertNullable`, but binds a non-null expected value to `expected`
+ * first, so a long path keeps the assertion inside ktlint's line width.
+ */
+function assertNullablePath(expected: string | null, actual: string): string[] {
+  return expected === null
+    ? [`assertNull(${actual})`]
+    : [
+        `val expected = ${kotlinString(expected)}`,
+        `assertEquals(expected, ${actual})`,
+      ];
+}
+
+function kotlinNullable(value: string | null): string {
+  return value === null ? "null" : kotlinString(value);
+}
+
 function osExpr(os: Os): string {
   return `Os.${os.toUpperCase()}`;
 }
@@ -99,16 +131,5 @@ function settingsLine(settings: PathSettings): string {
 }
 
 function probeLine(probe: Probe): string {
-  const which = probe.which === null ? "null" : kotlinString(probe.which);
-  return `val probe = Probe(${String(probe.projectInstalled)}, ${which})`;
-}
-
-function expectedLines(resolution: Resolution): string[] {
-  if (!resolution.found) {
-    return ["val expected = Resolution.NotFound"];
-  }
-  return [
-    `val command = ${kotlinString(resolution.command)}`,
-    `val expected = Resolution.Found(Source.${resolution.source.toUpperCase()}, command)`,
-  ];
+  return `val probe = Probe(${kotlinNullable(probe.projectBinary)}, ${kotlinNullable(probe.which)})`;
 }

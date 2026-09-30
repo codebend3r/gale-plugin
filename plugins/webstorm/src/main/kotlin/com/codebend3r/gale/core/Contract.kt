@@ -26,22 +26,14 @@ data class PathSettings(
     val binaryPath: String,
 )
 
-/** What the host found before calling [resolveBinary]. */
+/**
+ * What the host found before calling [resolveBinary]: the project's binary
+ * ([projectBinaryPath]) when it exists on disk, and `gale` on PATH.
+ */
 data class Probe(
-    val projectInstalled: Boolean,
+    val projectBinary: String?,
     val which: String?,
 )
-
-enum class Source { SETTING, PROJECT, PATH }
-
-sealed interface Resolution {
-    data class Found(
-        val source: Source,
-        val command: String,
-    ) : Resolution
-
-    data object NotFound : Resolution
-}
 
 /** The Rust target Gale publishes for this platform, or null if it publishes none. */
 fun rustTarget(platform: Platform): String? =
@@ -68,20 +60,8 @@ fun projectBinaryPath(
 /** Picks the binary to run: the setting, then the project install, then PATH. */
 fun resolveBinary(
     settings: PathSettings,
-    root: String?,
-    platform: Platform,
     probe: Probe,
-): Resolution {
-    if (settings.binaryPath.isNotEmpty()) {
-        return Resolution.Found(Source.SETTING, settings.binaryPath)
-    }
-    val projectPath = projectBinaryPath(root, platform)
-    if (projectPath != null && probe.projectInstalled) {
-        return Resolution.Found(Source.PROJECT, projectPath)
-    }
-    val onPath = probe.which ?: return Resolution.NotFound
-    return Resolution.Found(Source.PATH, onPath)
-}
+): String? = settings.binaryPath.ifEmpty { null } ?: probe.projectBinary ?: probe.which
 
 /** `--lsp`, plus `--config <path>` exactly as the user wrote it. */
 fun serverArgs(settings: PathSettings): List<String> =

@@ -15,17 +15,10 @@ fn settings(config_path: &str, binary_path: &str) -> PathSettings {
     }
 }
 
-fn probe(project_installed: bool, which: Option<&str>) -> Probe {
+fn probe(project_binary: Option<&str>, which: Option<&str>) -> Probe {
     Probe {
-        project_installed,
+        project_binary: project_binary.map(str::to_string),
         which: which.map(str::to_string),
-    }
-}
-
-fn found(source: Source, command: &str) -> Resolution {
-    Resolution::Found {
-        source,
-        command: command.to_string(),
     }
 }
 
@@ -90,112 +83,116 @@ fn binary_file_name_windows_uses_gale_exe() {
 }
 
 #[test]
+fn project_binary_path_macos_arm64() {
+    let platform = platform(Os::Darwin, "arm64");
+    let actual = project_binary_path(Some("/work/app"), platform);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale")
+    );
+}
+
+#[test]
+fn project_binary_path_linux_x64() {
+    let platform = platform(Os::Linux, "x64");
+    let actual = project_binary_path(Some("/home/dev/site"), platform);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/home/dev/site/node_modules/@codebend3r/gale/bin/x86_64-unknown-linux-gnu/gale")
+    );
+}
+
+#[test]
+fn project_binary_path_windows_uses_gale_exe() {
+    let platform = platform(Os::Win32, "x64");
+    let actual = project_binary_path(Some("/work/app"), platform);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/work/app/node_modules/@codebend3r/gale/bin/x86_64-pc-windows-msvc/gale.exe")
+    );
+}
+
+#[test]
+fn project_binary_path_root_with_a_trailing_slash() {
+    let platform = platform(Os::Darwin, "arm64");
+    let actual = project_binary_path(Some("/work/app/"), platform);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale")
+    );
+}
+
+#[test]
+fn project_binary_path_filesystem_root() {
+    let platform = platform(Os::Darwin, "arm64");
+    let actual = project_binary_path(Some("/"), platform);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale")
+    );
+}
+
+#[test]
+fn project_binary_path_no_workspace_root() {
+    let platform = platform(Os::Darwin, "arm64");
+    let actual = project_binary_path(None, platform);
+    assert_eq!(actual.as_deref(), None);
+}
+
+#[test]
+fn project_binary_path_platform_with_no_release() {
+    let platform = platform(Os::Win32, "arm64");
+    let actual = project_binary_path(Some("/work/app"), platform);
+    assert_eq!(actual.as_deref(), None);
+}
+
+#[test]
 fn resolve_binary_binary_path_setting_wins_over_project_and_path() {
     let settings = settings("", "/opt/gale/bin/gale");
-    let platform = platform(Os::Darwin, "arm64");
-    let probe = probe(true, Some("/usr/local/bin/gale"));
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = found(Source::Setting, "/opt/gale/bin/gale");
-    assert_eq!(actual, expected);
+    let probe = probe(
+        Some("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"),
+        Some("/usr/local/bin/gale"),
+    );
+    let actual = resolve_binary(&settings, probe);
+    assert_eq!(actual.as_deref(), Some("/opt/gale/bin/gale"));
 }
 
 #[test]
 fn resolve_binary_binary_path_setting_is_used_even_when_nothing_else_is_found() {
     let settings = settings("", "/opt/gale/bin/gale");
-    let platform = platform(Os::Darwin, "arm64");
-    let probe = probe(false, None);
-    let actual = resolve_binary(&settings, None, platform, &probe);
-    let expected = found(Source::Setting, "/opt/gale/bin/gale");
-    assert_eq!(actual, expected);
+    let probe = probe(None, None);
+    let actual = resolve_binary(&settings, probe);
+    assert_eq!(actual.as_deref(), Some("/opt/gale/bin/gale"));
 }
 
 #[test]
 fn resolve_binary_project_install_wins_over_path() {
     let settings = settings("", "");
-    let platform = platform(Os::Darwin, "arm64");
-    let probe = probe(true, Some("/usr/local/bin/gale"));
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = found(
-        Source::Project,
-        "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale",
+    let probe = probe(
+        Some("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"),
+        Some("/usr/local/bin/gale"),
     );
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn resolve_binary_project_install_on_linux_x64() {
-    let settings = settings("", "");
-    let platform = platform(Os::Linux, "x64");
-    let probe = probe(true, None);
-    let actual = resolve_binary(&settings, Some("/home/dev/site"), platform, &probe);
-    let expected = found(
-        Source::Project,
-        "/home/dev/site/node_modules/@codebend3r/gale/bin/x86_64-unknown-linux-gnu/gale",
+    let actual = resolve_binary(&settings, probe);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale")
     );
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn resolve_binary_project_install_on_windows_uses_gale_exe() {
-    let settings = settings("", "");
-    let platform = platform(Os::Win32, "x64");
-    let probe = probe(true, None);
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = found(
-        Source::Project,
-        "/work/app/node_modules/@codebend3r/gale/bin/x86_64-pc-windows-msvc/gale.exe",
-    );
-    assert_eq!(actual, expected);
 }
 
 #[test]
 fn resolve_binary_path_is_used_when_the_project_has_no_install() {
     let settings = settings("", "");
-    let platform = platform(Os::Darwin, "arm64");
-    let probe = probe(false, Some("/usr/local/bin/gale"));
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = found(Source::Path, "/usr/local/bin/gale");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn resolve_binary_path_is_used_when_there_is_no_workspace_root() {
-    let settings = settings("", "");
-    let platform = platform(Os::Darwin, "arm64");
-    let probe = probe(true, Some("/usr/local/bin/gale"));
-    let actual = resolve_binary(&settings, None, platform, &probe);
-    let expected = found(Source::Path, "/usr/local/bin/gale");
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn resolve_binary_path_is_used_on_a_platform_with_no_release() {
-    let settings = settings("", "");
-    let platform = platform(Os::Win32, "arm64");
-    let probe = probe(true, Some("/usr/local/bin/gale"));
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = found(Source::Path, "/usr/local/bin/gale");
-    assert_eq!(actual, expected);
+    let probe = probe(None, Some("/usr/local/bin/gale"));
+    let actual = resolve_binary(&settings, probe);
+    assert_eq!(actual.as_deref(), Some("/usr/local/bin/gale"));
 }
 
 #[test]
 fn resolve_binary_nothing_found() {
     let settings = settings("", "");
-    let platform = platform(Os::Darwin, "arm64");
-    let probe = probe(false, None);
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = Resolution::NotFound;
-    assert_eq!(actual, expected);
-}
-
-#[test]
-fn resolve_binary_nothing_found_on_a_platform_with_no_release() {
-    let settings = settings("", "");
-    let platform = platform(Os::Linux, "riscv64");
-    let probe = probe(true, None);
-    let actual = resolve_binary(&settings, Some("/work/app"), platform, &probe);
-    let expected = Resolution::NotFound;
-    assert_eq!(actual, expected);
+    let probe = probe(None, None);
+    let actual = resolve_binary(&settings, probe);
+    assert_eq!(actual.as_deref(), None);
 }
 
 #[test]

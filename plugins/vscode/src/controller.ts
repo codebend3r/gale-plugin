@@ -82,11 +82,12 @@ export class GaleController {
     };
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? null;
     const projectPath = projectBinaryPath(root, this.platform);
-    const resolution = resolveBinary(settings, root, this.platform, {
-      projectInstalled: projectPath !== null && existsSync(projectPath),
+    const command = resolveBinary(settings, {
+      projectBinary:
+        projectPath !== null && existsSync(projectPath) ? projectPath : null,
       which: which.sync(facts.server.command, { nothrow: true }),
     });
-    if (!resolution.found) {
+    if (command === null) {
       void this.showMissingBinary();
       return;
     }
@@ -95,7 +96,7 @@ export class GaleController {
       "gale",
       "Gale",
       {
-        command: resolution.command,
+        command,
         args: serverArgs(settings),
         options: root === null ? {} : { cwd: root },
       },

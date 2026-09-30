@@ -12,16 +12,11 @@ export interface PathSettings {
   readonly binaryPath: string;
 }
 
-/** What the host found before calling `resolveBinary`. */
+/**
+ * What the host found before calling `resolveBinary`: the project's binary
+ * (`projectBinaryPath`) when it exists on disk, and `gale` on PATH.
+ */
 export interface Probe {
-  readonly projectInstalled: boolean;
+  readonly projectBinary: string | null;
   readonly which: string | null;
 }
-
-export type Resolution =
-  | {
-      readonly found: true;
-      readonly source: "setting" | "project" | "path";
-      readonly command: string;
-    }
-  | { readonly found: false };

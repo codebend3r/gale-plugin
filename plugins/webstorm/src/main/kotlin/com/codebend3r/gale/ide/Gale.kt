@@ -4,7 +4,6 @@ import com.codebend3r.gale.core.Os
 import com.codebend3r.gale.core.PathSettings
 import com.codebend3r.gale.core.Platform
 import com.codebend3r.gale.core.Probe
-import com.codebend3r.gale.core.Resolution
 import com.codebend3r.gale.core.projectBinaryPath
 import com.codebend3r.gale.core.resolveBinary
 import com.codebend3r.gale.generated.GaleFacts
@@ -50,21 +49,19 @@ fun platformFor(
 
 fun currentPlatform(): Platform = platformFor(System.getProperty("os.name"), System.getProperty("os.arch"))
 
-/** Gathers the probes for [project] and asks the contract which binary to run. */
+/** Gathers the probes for [project] and asks the contract which binary to run, or null if none is found. */
 fun resolveGale(
     project: Project,
     settings: PathSettings,
     platform: Platform,
     locator: BinaryLocator,
-): Resolution {
-    val root = project.basePath
-    val projectPath = projectBinaryPath(root, platform)
+): String? {
     val probe =
         Probe(
-            projectInstalled = projectPath != null && locator.isFile(projectPath),
+            projectBinary = projectBinaryPath(project.basePath, platform)?.takeIf(locator::isFile),
             which = locator.findOnPath(GaleFacts.SERVER_COMMAND),
         )
-    return resolveBinary(settings, root, platform, probe)
+    return resolveBinary(settings, probe)
 }
 
 fun isGaleFile(file: VirtualFile): Boolean = file.extension?.lowercase() in GaleFacts.LANGUAGE_EXTENSIONS

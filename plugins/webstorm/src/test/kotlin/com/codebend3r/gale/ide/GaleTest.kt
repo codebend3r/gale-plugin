@@ -3,8 +3,6 @@ package com.codebend3r.gale.ide
 import com.codebend3r.gale.core.Os
 import com.codebend3r.gale.core.PathSettings
 import com.codebend3r.gale.core.Platform
-import com.codebend3r.gale.core.Resolution
-import com.codebend3r.gale.core.Source
 import com.intellij.testFramework.LightVirtualFile
 import java.nio.file.Files
 
@@ -50,15 +48,15 @@ class GaleTest : GaleTestCase() {
     fun testResolvesTheProjectInstallUnderTheProjectBasePath() {
         val expected = "${project.basePath}/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
 
-        val resolution = resolveGale(project, noSettings, macArm, FakeLocator(files = setOf(expected), onPath = "/usr/bin/gale"))
+        val command = resolveGale(project, noSettings, macArm, FakeLocator(files = setOf(expected), onPath = "/usr/bin/gale"))
 
-        assertEquals(Resolution.Found(Source.PROJECT, expected), resolution)
+        assertEquals(expected, command)
     }
 
     fun testFallsBackToPATH() {
-        val resolution = resolveGale(project, noSettings, macArm, FakeLocator(onPath = "/usr/bin/gale"))
+        val command = resolveGale(project, noSettings, macArm, FakeLocator(onPath = "/usr/bin/gale"))
 
-        assertEquals(Resolution.Found(Source.PATH, "/usr/bin/gale"), resolution)
+        assertEquals("/usr/bin/gale", command)
     }
 
     fun testSkipsTheProjectProbeOnAPlatformWithNoRelease() {
@@ -69,7 +67,7 @@ class GaleTest : GaleTestCase() {
                 override fun findOnPath(name: String): String? = null
             }
 
-        assertEquals(Resolution.NotFound, resolveGale(project, noSettings, Platform(Os.WIN32, "arm64"), locator))
+        assertNull(resolveGale(project, noSettings, Platform(Os.WIN32, "arm64"), locator))
     }
 
     fun testRestartingWithNoRunningClientDoesNothing() {
