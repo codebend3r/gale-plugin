@@ -6,6 +6,11 @@ plugins share one [semantic version](https://semver.org) and one git tag.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-30
+
+No user-visible changes. Only the repository's release tooling changed since
+1.0.0.
+
 ## [1.0.0] - 2026-09-30
 
 The first public release. Three plugins run `gale --lsp` and show its
@@ -30,5 +35,6 @@ diagnostics and quick fixes for CSS, SCSS, Less, and Sass.
   plugin implements, and an Nx sync generator writes them into the Rust and
   Kotlin sources, so the three plugins are held to the same behavior.
 
-[Unreleased]: https://github.com/codebend3r/gale-plugin/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/codebend3r/gale-plugin/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/codebend3r/gale-plugin/releases/tag/v1.0.1
 [1.0.0]: https://github.com/codebend3r/gale-plugin/releases/tag/v1.0.0

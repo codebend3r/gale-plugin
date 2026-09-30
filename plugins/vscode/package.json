@@ -2,7 +2,7 @@
   "name": "gale-lint",
   "displayName": "Gale CSS Linter",
   "description": "An extremely fast CSS linter, written in Rust",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "private": true,
   "publisher": "gale",
