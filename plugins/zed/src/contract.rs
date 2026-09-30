@@ -40,24 +40,12 @@ pub struct PathSettings {
     pub binary_path: String,
 }
 
-/// What the host found before calling `resolve_binary`.
+/// What the host found before calling `resolve_binary`: the project's binary
+/// (`project_binary_path`) when it exists on disk, and `gale` on PATH.
 #[derive(Clone, Debug)]
 pub struct Probe {
-    pub project_installed: bool,
+    pub project_binary: Option<String>,
     pub which: Option<String>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Source {
-    Setting,
-    Project,
-    Path,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum Resolution {
-    Found { source: Source, command: String },
-    NotFound,
 }
 
 /// The Rust target Gale publishes for this platform, or `None` if it publishes none.
@@ -87,31 +75,11 @@ pub fn project_binary_path(root: Option<&str>, platform: Platform) -> Option<Str
 }
 
 /// Picks the binary to run: the setting, then the project install, then PATH.
-pub fn resolve_binary(
-    settings: &PathSettings,
-    root: Option<&str>,
-    platform: Platform,
-    probe: &Probe,
-) -> Resolution {
+pub fn resolve_binary(settings: &PathSettings, probe: Probe) -> Option<String> {
     if !settings.binary_path.is_empty() {
-        return Resolution::Found {
-            source: Source::Setting,
-            command: settings.binary_path.clone(),
-        };
+        return Some(settings.binary_path.clone());
     }
-    if let Some(path) = project_binary_path(root, platform).filter(|_| probe.project_installed) {
-        return Resolution::Found {
-            source: Source::Project,
-            command: path,
-        };
-    }
-    match &probe.which {
-        Some(path) => Resolution::Found {
-            source: Source::Path,
-            command: path.clone(),
-        },
-        None => Resolution::NotFound,
-    }
+    probe.project_binary.or(probe.which)
 }
 
 /// `--lsp`, plus `--config <path>` exactly as the user wrote it.
@@ -217,19 +185,6 @@ mod tests {
         assert_eq!(
             command_args(&PathSettings::default(), Some(arguments.clone())),
             arguments
-        );
-    }
-
-    #[test]
-    fn project_binary_path_drops_a_trailing_slash_on_the_root() {
-        let platform = Platform {
-            os: Os::Linux,
-            arch: "x64",
-        };
-
-        assert_eq!(
-            project_binary_path(Some("/"), platform).as_deref(),
-            Some("/node_modules/@codebend3r/gale/bin/x86_64-unknown-linux-gnu/gale")
         );
     }
 }

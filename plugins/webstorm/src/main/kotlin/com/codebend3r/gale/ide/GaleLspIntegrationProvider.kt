@@ -2,7 +2,6 @@ package com.codebend3r.gale.ide
 
 import com.codebend3r.gale.core.PathSettings
 import com.codebend3r.gale.core.Platform
-import com.codebend3r.gale.core.Resolution
 import com.codebend3r.gale.core.serverArgs
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
@@ -27,9 +26,9 @@ class GaleLspIntegrationProvider internal constructor(
             return
         }
         val pathSettings = settings.pathSettings
-        val resolution = resolveGale(project, pathSettings, platform, locator)
-        if (resolution is Resolution.Found) {
-            clientStarter.ensureClientStarted(GaleClientDescriptor(project, resolution.command, pathSettings))
+        val command = resolveGale(project, pathSettings, platform, locator)
+        if (command != null) {
+            clientStarter.ensureClientStarted(GaleClientDescriptor(project, command, pathSettings))
         } else {
             notifier.notify(project)
         }

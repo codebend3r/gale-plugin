@@ -64,111 +64,89 @@ class ConformanceTest {
     }
 
     @Test
+    fun \`project binary path macOS arm64\`() {
+        val platform = Platform(Os.DARWIN, "arm64")
+        val expected = "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
+        assertEquals(expected, projectBinaryPath("/work/app", platform))
+    }
+
+    @Test
+    fun \`project binary path Linux x64\`() {
+        val platform = Platform(Os.LINUX, "x64")
+        val expected = "/home/dev/site/node_modules/@codebend3r/gale/bin/x86_64-unknown-linux-gnu/gale"
+        assertEquals(expected, projectBinaryPath("/home/dev/site", platform))
+    }
+
+    @Test
+    fun \`project binary path Windows uses gale exe\`() {
+        val platform = Platform(Os.WIN32, "x64")
+        val expected = "/work/app/node_modules/@codebend3r/gale/bin/x86_64-pc-windows-msvc/gale.exe"
+        assertEquals(expected, projectBinaryPath("/work/app", platform))
+    }
+
+    @Test
+    fun \`project binary path root with a trailing slash\`() {
+        val platform = Platform(Os.DARWIN, "arm64")
+        val expected = "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
+        assertEquals(expected, projectBinaryPath("/work/app/", platform))
+    }
+
+    @Test
+    fun \`project binary path filesystem root\`() {
+        val platform = Platform(Os.DARWIN, "arm64")
+        val expected = "/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
+        assertEquals(expected, projectBinaryPath("/", platform))
+    }
+
+    @Test
+    fun \`project binary path no workspace root\`() {
+        val platform = Platform(Os.DARWIN, "arm64")
+        assertNull(projectBinaryPath(null, platform))
+    }
+
+    @Test
+    fun \`project binary path platform with no release\`() {
+        val platform = Platform(Os.WIN32, "arm64")
+        assertNull(projectBinaryPath("/work/app", platform))
+    }
+
+    @Test
     fun \`resolve binary binary path setting wins over project and PATH\`() {
         val settings = PathSettings("", "/opt/gale/bin/gale")
-        val root = "/work/app"
-        val platform = Platform(Os.DARWIN, "arm64")
-        val probe = Probe(true, "/usr/local/bin/gale")
-        val command = "/opt/gale/bin/gale"
-        val expected = Resolution.Found(Source.SETTING, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
+        val probe = Probe("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale", "/usr/local/bin/gale")
+        val expected = "/opt/gale/bin/gale"
+        assertEquals(expected, resolveBinary(settings, probe))
     }
 
     @Test
     fun \`resolve binary binary path setting is used even when nothing else is found\`() {
         val settings = PathSettings("", "/opt/gale/bin/gale")
-        val root: String? = null
-        val platform = Platform(Os.DARWIN, "arm64")
-        val probe = Probe(false, null)
-        val command = "/opt/gale/bin/gale"
-        val expected = Resolution.Found(Source.SETTING, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
+        val probe = Probe(null, null)
+        val expected = "/opt/gale/bin/gale"
+        assertEquals(expected, resolveBinary(settings, probe))
     }
 
     @Test
     fun \`resolve binary project install wins over PATH\`() {
         val settings = PathSettings("", "")
-        val root = "/work/app"
-        val platform = Platform(Os.DARWIN, "arm64")
-        val probe = Probe(true, "/usr/local/bin/gale")
-        val command = "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
-        val expected = Resolution.Found(Source.PROJECT, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
-    }
-
-    @Test
-    fun \`resolve binary project install on Linux x64\`() {
-        val settings = PathSettings("", "")
-        val root = "/home/dev/site"
-        val platform = Platform(Os.LINUX, "x64")
-        val probe = Probe(true, null)
-        val command = "/home/dev/site/node_modules/@codebend3r/gale/bin/x86_64-unknown-linux-gnu/gale"
-        val expected = Resolution.Found(Source.PROJECT, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
-    }
-
-    @Test
-    fun \`resolve binary project install on Windows uses gale exe\`() {
-        val settings = PathSettings("", "")
-        val root = "/work/app"
-        val platform = Platform(Os.WIN32, "x64")
-        val probe = Probe(true, null)
-        val command = "/work/app/node_modules/@codebend3r/gale/bin/x86_64-pc-windows-msvc/gale.exe"
-        val expected = Resolution.Found(Source.PROJECT, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
+        val probe = Probe("/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale", "/usr/local/bin/gale")
+        val expected = "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
+        assertEquals(expected, resolveBinary(settings, probe))
     }
 
     @Test
     fun \`resolve binary PATH is used when the project has no install\`() {
         val settings = PathSettings("", "")
-        val root = "/work/app"
-        val platform = Platform(Os.DARWIN, "arm64")
-        val probe = Probe(false, "/usr/local/bin/gale")
-        val command = "/usr/local/bin/gale"
-        val expected = Resolution.Found(Source.PATH, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
-    }
-
-    @Test
-    fun \`resolve binary PATH is used when there is no workspace root\`() {
-        val settings = PathSettings("", "")
-        val root: String? = null
-        val platform = Platform(Os.DARWIN, "arm64")
-        val probe = Probe(true, "/usr/local/bin/gale")
-        val command = "/usr/local/bin/gale"
-        val expected = Resolution.Found(Source.PATH, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
-    }
-
-    @Test
-    fun \`resolve binary PATH is used on a platform with no release\`() {
-        val settings = PathSettings("", "")
-        val root = "/work/app"
-        val platform = Platform(Os.WIN32, "arm64")
-        val probe = Probe(true, "/usr/local/bin/gale")
-        val command = "/usr/local/bin/gale"
-        val expected = Resolution.Found(Source.PATH, command)
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
+        val probe = Probe(null, "/usr/local/bin/gale")
+        val expected = "/usr/local/bin/gale"
+        assertEquals(expected, resolveBinary(settings, probe))
     }
 
     @Test
     fun \`resolve binary nothing found\`() {
         val settings = PathSettings("", "")
-        val root = "/work/app"
-        val platform = Platform(Os.DARWIN, "arm64")
-        val probe = Probe(false, null)
-        val expected = Resolution.NotFound
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
-    }
-
-    @Test
-    fun \`resolve binary nothing found on a platform with no release\`() {
-        val settings = PathSettings("", "")
-        val root = "/work/app"
-        val platform = Platform(Os.LINUX, "riscv64")
-        val probe = Probe(true, null)
-        val expected = Resolution.NotFound
-        assertEquals(expected, resolveBinary(settings, root, platform, probe))
+        val probe = Probe(null, null)
+        assertNull(resolveBinary(settings, probe))
     }
 
     @Test

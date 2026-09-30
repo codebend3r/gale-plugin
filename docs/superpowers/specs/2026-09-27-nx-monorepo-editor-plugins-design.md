@@ -190,7 +190,8 @@ so the compiler checks their shape. There's one file per function under test.
 | File | Function | Run by |
 |---|---|---|
 | `platform.ts` | `rustTarget(platform)` and `binaryFileName(os)` | TS, Rust, Kotlin |
-| `resolve-binary.ts` | `resolveBinary(settings, root, platform, probe)` | TS, Rust, Kotlin |
+| `project-binary-path.ts` | `projectBinaryPath(root, platform)` | TS, Rust, Kotlin |
+| `resolve-binary.ts` | `resolveBinary(settings, probe)` | TS, Rust, Kotlin |
 | `server-args.ts` | `serverArgs(settings)` | TS, Rust, Kotlin |
 | `should-restart.ts` | `shouldRestart(changedPath, root, settings)` | TS, Kotlin |
 
@@ -201,15 +202,12 @@ Example (`resolve-binary.ts`):
   name: "project install wins over PATH",
   input: {
     settings: { configPath: "", binaryPath: "" },
-    root: "/work/app",
-    platform: { os: "darwin", arch: "arm64" },
-    probe: { projectInstalled: true, which: "/usr/local/bin/gale" },
+    probe: {
+      projectBinary: "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale",
+      which: "/usr/local/bin/gale",
+    },
   },
-  expected: {
-    found: true,
-    source: "project",
-    command: "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale",
-  },
+  expected: "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale",
 }
 ```
 
@@ -228,13 +226,10 @@ results in.
 Os           = "darwin" | "linux" | "win32"
 Platform     = { os: Os, arch: string }                    // arch: "arm64", "x64", or anything else
 PathSettings = { configPath: string, binaryPath: string }  // the only settings these functions read
-Probe        = { projectInstalled: bool, which: string | null }
-Resolution   =
-  | { found: true, source: "setting" | "project" | "path", command: string }
-  | { found: false }
+Probe        = { projectBinary: string | null, which: string | null }
 ```
 
-- **Probes are eager:** the host gathers `projectInstalled` and `which` before calling `resolveBinary`. Both checks are cheap.
+- **Probes are eager:** the host gathers `projectBinary` (the `projectBinaryPath`, if it exists on disk) and `which` before calling `resolveBinary`. Both checks are cheap.
 - **Platform mapping is glue:** each host maps its native platform values onto `Platform`.
 - **`enable` isn't an input:** starting or not starting the server is glue logic, and none of these functions reads it.
 
@@ -262,11 +257,9 @@ Resolution   =
 2. **`projectBinaryPath(root, platform)`** returns
    `<root>/node_modules/@codebend3r/gale/bin/<target>/<binaryFileName>`.
    It returns `null` when `root` is null or `rustTarget` is null.
-3. **`resolveBinary(settings, root, platform, probe)`** takes the first match:
-   1. `settings.binaryPath` is non-empty: `{ source: "setting", command: binaryPath }`, used as given. The setting is documented as an absolute path.
-   2. `projectBinaryPath` is non-null and `probe.projectInstalled` is true: `{ source: "project", command: projectBinaryPath }`.
-   3. `probe.which` is non-null: `{ source: "path", command: probe.which }`.
-   4. Otherwise: `{ found: false }`.
+3. **`resolveBinary(settings, probe)`** returns the first non-empty value of
+   `settings.binaryPath` (used as given; the setting is documented as an absolute path),
+   `probe.projectBinary`, and `probe.which`, or `null` when all three are empty.
 4. **`serverArgs(settings)`** returns `["--lsp"]`, plus `"--config", configPath` when `configPath` is non-empty. The path is passed exactly as the user wrote it.
 5. **`shouldRestart(changedPath, root, settings)`** (`root` is never null here, because watchers only exist when there's a workspace root). It checks these rules in order:
    1. `false` if any path segment of `changedPath` is `node_modules`.
@@ -283,7 +276,7 @@ the template themselves.
 
 ### How each host probes and sets the working directory
 
-| | `projectInstalled` | `which` | Server working directory |
+| | `projectBinary` (the `projectBinaryPath` when this holds) | `which` | Server working directory |
 |---|---|---|---|
 | VS Code | `fs.existsSync(projectBinaryPath)` | `which.sync("gale", { nothrow: true })` (the `which` npm package) | `ServerOptions.options.cwd` = first workspace folder |
 | Zed | `worktree.read_text_file("node_modules/@codebend3r/gale/package.json")` succeeds | `worktree.which("gale")` | set by Zed; checked in R6 |

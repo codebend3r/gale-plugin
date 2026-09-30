@@ -8,7 +8,7 @@ mod generated;
 #[cfg(test)]
 mod conformance_tests;
 
-use contract::{Os, Platform, Probe, Resolution};
+use contract::{Os, Platform, Probe};
 use zed_extension_api::{self as zed, LanguageServerId, Result, settings::LspSettings};
 
 struct GaleExtension;
@@ -31,18 +31,18 @@ impl zed::Extension for GaleExtension {
         let settings = contract::path_settings(binary_path.as_deref(), lsp.settings.as_ref());
         let root = worktree.root_path();
         let platform = current_platform();
-        let project_path = contract::project_binary_path(Some(&root), platform);
         let probe = Probe {
-            project_installed: project_path.as_deref().is_some_and(is_file),
+            project_binary: contract::project_binary_path(Some(&root), platform)
+                .filter(|path| is_file(path)),
             which: worktree.which(generated::SERVER_COMMAND),
         };
-        match contract::resolve_binary(&settings, Some(&root), platform, &probe) {
-            Resolution::Found { command, .. } => Ok(zed::Command {
+        match contract::resolve_binary(&settings, probe) {
+            Some(command) => Ok(zed::Command {
                 command,
                 args: contract::command_args(&settings, arguments),
                 env: Vec::new(),
             }),
-            Resolution::NotFound => Err(generated::MISSING_BINARY_MESSAGE.to_string()),
+            None => Err(generated::MISSING_BINARY_MESSAGE.to_string()),
         }
     }
 }

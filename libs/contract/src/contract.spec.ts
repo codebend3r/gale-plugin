@@ -5,6 +5,7 @@ import {
   facts,
   missingBinaryMessages,
   projectBinaryPath,
+  projectBinaryPathCases,
   resolveBinary,
   resolveBinaryCases,
   rustTarget,
@@ -27,11 +28,15 @@ describe("binaryFileName", () => {
   });
 });
 
+describe("projectBinaryPath", () => {
+  it.each(projectBinaryPathCases)("$name", ({ input, expected }) => {
+    expect(projectBinaryPath(input.root, input.platform)).toBe(expected);
+  });
+});
+
 describe("resolveBinary", () => {
   it.each(resolveBinaryCases)("$name", ({ input, expected }) => {
-    expect(
-      resolveBinary(input.settings, input.root, input.platform, input.probe),
-    ).toEqual(expected);
+    expect(resolveBinary(input.settings, input.probe)).toBe(expected);
   });
 });
 
@@ -46,18 +51,6 @@ describe("shouldRestart", () => {
     expect(shouldRestart(input.changedPath, input.root, input.settings)).toBe(
       expected,
     );
-  });
-});
-
-describe("projectBinaryPath", () => {
-  it("is null without a workspace root", () => {
-    expect(projectBinaryPath(null, { os: "darwin", arch: "arm64" })).toBeNull();
-  });
-
-  it("is null on a platform with no release", () => {
-    expect(
-      projectBinaryPath("/work/app", { os: "win32", arch: "arm64" }),
-    ).toBeNull();
   });
 });
 
@@ -104,6 +97,7 @@ describe("the cases cover the facts", () => {
   it.each([
     ["rustTarget", rustTargetCases],
     ["binaryFileName", binaryFileNameCases],
+    ["projectBinaryPath", projectBinaryPathCases],
     ["resolveBinary", resolveBinaryCases],
     ["serverArgs", serverArgsCases],
     ["shouldRestart", shouldRestartCases],
