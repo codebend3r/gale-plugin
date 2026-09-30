@@ -1,7 +1,7 @@
 id = "gale"
 name = "Gale"
 description = "Gale CSS linter diagnostics and quick fixes for CSS, SCSS, Less, and Sass."
-version = "0.7.0"
+version = "1.0.0"
 schema_version = 1
 authors = ["CJ Rivas"]
 repository = "https://github.com/codebend3r/gale-plugin"

@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.codebend3r.gale"
-version = "0.7.0"
+version = "1.0.0"
 
 kotlin {
     jvmToolchain(25)
