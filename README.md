@@ -4,13 +4,18 @@ Editor clients for [Gale](https://github.com/codebend3r/gale), an extremely fast
 CSS linter written in Rust. Each plugin runs `gale --lsp` and shows its
 diagnostics and quick fixes for CSS, SCSS, Less, and Sass.
 
-| Plugin   | Path               | Language              | Output                    |
-| -------- | ------------------ | --------------------- | ------------------------- |
-| VS Code  | `plugins/vscode`   | TypeScript            | `dist/gale-lint.vsix`     |
-| Zed      | `plugins/zed`      | Rust (WASM)           | `extension.wasm`          |
-| WebStorm | `plugins/webstorm` | Kotlin (IntelliJ LSP) | `gale-webstorm-0.7.0.zip` |
+| Plugin   | Path               | Language              | Output                        |
+| -------- | ------------------ | --------------------- | ----------------------------- |
+| VS Code  | `plugins/vscode`   | TypeScript            | `dist/gale-lint.vsix`         |
+| Zed      | `plugins/zed`      | Rust (WASM)           | `extension.wasm`              |
+| WebStorm | `plugins/webstorm` | Kotlin (IntelliJ LSP) | `gale-webstorm-<version>.zip` |
 
-The plugins aren't published to any marketplace. Build and install them locally.
+The plugins aren't on any marketplace. Each
+[GitHub release](https://github.com/codebend3r/gale-plugin/releases) attaches
+the VS Code `.vsix` and the WebStorm `.zip`. Zed compiles its extension from
+source, so its users install from the release's source archive or a clone.
+The three plugins share one version and one `v<version>` tag; see
+[CHANGELOG.md](CHANGELOG.md) for what each release changed.
 
 ## Finding the gale binary
 
@@ -27,6 +32,14 @@ starts in the project root, so a relative config path resolves from there.
 
 ### VS Code
 
+From a release, download `gale-lint-<version>.vsix` and install it:
+
+```sh
+code --install-extension gale-lint-<version>.vsix
+```
+
+From source:
+
 ```sh
 bunx nx run vscode:install
 ```
@@ -37,6 +50,10 @@ This builds `plugins/vscode/dist/gale-lint.vsix` and installs it with
 changes.
 
 ### Zed
+
+Zed builds Rust extensions from source, so download the release's source
+archive (or clone the repo at its tag) and install the Rust toolchain with the
+`wasm32-wasip2` target (see [One-time setup](#one-time-setup)).
 
 Run **zed: install dev extension** and pick the `plugins/zed` folder. Install
 Zed's `scss` and `less` extensions for SCSS, Sass, and Less; CSS is built in.
@@ -60,6 +77,13 @@ one. The extension checks for the project's gale binary with `test -f`, so it
 declares the `process:exec` capability.
 
 ### WebStorm
+
+From a release, download `gale-webstorm-<version>.zip`, open
+**Settings › Plugins**, click the gear icon, choose **Install Plugin from
+Disk…**, and pick the zip. WebStorm warns that the plugin isn't signed; that's
+expected. Restart WebStorm afterwards.
+
+From source:
 
 ```sh
 bunx nx run webstorm:install
@@ -132,6 +156,19 @@ start Bun's own test runner and bundler.
   nothing new to push.
 
 To skip a hook once, pass `--no-verify`.
+
+### Releasing
+
+The three plugins share one version and one `v<version>` git tag, and every
+release is a [GitHub release](https://github.com/codebend3r/gale-plugin/releases)
+with the VS Code and WebStorm builds attached. Two skills under
+`.claude/skills` hold the procedures:
+
+- `versioning-and-tagging` picks the version, runs `set-version.sh` to write
+  it everywhere it lives, records the changes in [CHANGELOG.md](CHANGELOG.md),
+  commits on `main`, and tags the commit once CI passes.
+- `publishing-release` builds the plugins at the tag and publishes the GitHub
+  release with the changelog section as its notes.
 
 ## License
 
