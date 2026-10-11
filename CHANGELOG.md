@@ -6,6 +6,12 @@ plugins share one [semantic version](https://semver.org) and one git tag.
 
 ## [Unreleased]
 
+### Added
+
+- Windows on ARM: every plugin now finds the project's `@codebend3r/gale`
+  binary (`aarch64-pc-windows-msvc`), which gale's npm package maps alongside
+  the other five platforms.
+
 ## [1.0.1] - 2026-09-30
 
 No user-visible changes. Only the repository's release tooling changed since

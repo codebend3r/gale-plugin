@@ -67,7 +67,7 @@ class GaleTest : GaleTestCase() {
                 override fun findOnPath(name: String): String? = null
             }
 
-        assertNull(resolveGale(project, noSettings, Platform(Os.WIN32, "arm64"), locator))
+        assertNull(resolveGale(project, noSettings, Platform(Os.LINUX, "riscv64"), locator))
     }
 
     fun testRestartingWithNoRunningClientDoesNothing() {

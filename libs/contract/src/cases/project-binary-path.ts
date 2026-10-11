@@ -28,6 +28,12 @@ export const projectBinaryPathCases = [
       "/work/app/node_modules/@codebend3r/gale/bin/x86_64-pc-windows-msvc/gale.exe",
   },
   {
+    name: "Windows arm64",
+    input: { root: "/work/app", platform: { os: "win32", arch: "arm64" } },
+    expected:
+      "/work/app/node_modules/@codebend3r/gale/bin/aarch64-pc-windows-msvc/gale.exe",
+  },
+  {
     name: "root with a trailing slash",
     input: { root: "/work/app/", platform: macArm },
     expected:
@@ -45,7 +51,7 @@ export const projectBinaryPathCases = [
   },
   {
     name: "platform with no release",
-    input: { root: "/work/app", platform: { os: "win32", arch: "arm64" } },
+    input: { root: "/work/app", platform: { os: "linux", arch: "riscv64" } },
     expected: null,
   },
 ] as const satisfies readonly Case<ProjectBinaryPathInput, string | null>[];

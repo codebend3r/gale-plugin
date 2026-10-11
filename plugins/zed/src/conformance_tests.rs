@@ -53,9 +53,9 @@ fn rust_target_windows_x64() {
 }
 
 #[test]
-fn rust_target_windows_arm64_has_no_release() {
+fn rust_target_windows_arm64() {
     let actual = rust_target(platform(Os::Win32, "arm64"));
-    assert_eq!(actual, None);
+    assert_eq!(actual, Some("aarch64-pc-windows-msvc"));
 }
 
 #[test]
@@ -113,6 +113,16 @@ fn project_binary_path_windows_uses_gale_exe() {
 }
 
 #[test]
+fn project_binary_path_windows_arm64() {
+    let platform = platform(Os::Win32, "arm64");
+    let actual = project_binary_path(Some("/work/app"), platform);
+    assert_eq!(
+        actual.as_deref(),
+        Some("/work/app/node_modules/@codebend3r/gale/bin/aarch64-pc-windows-msvc/gale.exe")
+    );
+}
+
+#[test]
 fn project_binary_path_root_with_a_trailing_slash() {
     let platform = platform(Os::Darwin, "arm64");
     let actual = project_binary_path(Some("/work/app/"), platform);
@@ -141,7 +151,7 @@ fn project_binary_path_no_workspace_root() {
 
 #[test]
 fn project_binary_path_platform_with_no_release() {
-    let platform = platform(Os::Win32, "arm64");
+    let platform = platform(Os::Linux, "riscv64");
     let actual = project_binary_path(Some("/work/app"), platform);
     assert_eq!(actual.as_deref(), None);
 }

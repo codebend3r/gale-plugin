@@ -35,6 +35,7 @@ export const facts = {
     { os: "darwin", arch: "x64", target: "x86_64-apple-darwin" },
     { os: "linux", arch: "arm64", target: "aarch64-unknown-linux-gnu" },
     { os: "linux", arch: "x64", target: "x86_64-unknown-linux-gnu" },
+    { os: "win32", arch: "arm64", target: "aarch64-pc-windows-msvc" },
     { os: "win32", arch: "x64", target: "x86_64-pc-windows-msvc" },
   ],
   settings: {

@@ -18,6 +18,7 @@ object GaleFacts {
             Triple("darwin", "x64", "x86_64-apple-darwin"),
             Triple("linux", "arm64", "aarch64-unknown-linux-gnu"),
             Triple("linux", "x64", "x86_64-unknown-linux-gnu"),
+            Triple("win32", "arm64", "aarch64-pc-windows-msvc"),
             Triple("win32", "x64", "x86_64-pc-windows-msvc"),
         )
 

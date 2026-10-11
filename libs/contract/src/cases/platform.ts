@@ -28,9 +28,9 @@ export const rustTargetCases = [
     expected: "x86_64-pc-windows-msvc",
   },
   {
-    name: "Windows arm64 has no release",
+    name: "Windows arm64",
     input: { os: "win32", arch: "arm64" },
-    expected: null,
+    expected: "aarch64-pc-windows-msvc",
   },
   {
     name: "unknown arch has no release",

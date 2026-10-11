@@ -36,8 +36,8 @@ class ConformanceTest {
     }
 
     @Test
-    fun `rust target Windows arm64 has no release`() {
-        assertNull(rustTarget(Platform(Os.WIN32, "arm64")))
+    fun `rust target Windows arm64`() {
+        assertEquals("aarch64-pc-windows-msvc", rustTarget(Platform(Os.WIN32, "arm64")))
     }
 
     @Test
@@ -82,6 +82,13 @@ class ConformanceTest {
     }
 
     @Test
+    fun `project binary path Windows arm64`() {
+        val platform = Platform(Os.WIN32, "arm64")
+        val expected = "/work/app/node_modules/@codebend3r/gale/bin/aarch64-pc-windows-msvc/gale.exe"
+        assertEquals(expected, projectBinaryPath("/work/app", platform))
+    }
+
+    @Test
     fun `project binary path root with a trailing slash`() {
         val platform = Platform(Os.DARWIN, "arm64")
         val expected = "/work/app/node_modules/@codebend3r/gale/bin/aarch64-apple-darwin/gale"
@@ -103,7 +110,7 @@ class ConformanceTest {
 
     @Test
     fun `project binary path platform with no release`() {
-        val platform = Platform(Os.WIN32, "arm64")
+        val platform = Platform(Os.LINUX, "riscv64")
         assertNull(projectBinaryPath("/work/app", platform))
     }
 
