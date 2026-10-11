@@ -1,7 +1,14 @@
 # Nightly gale compatibility checks: design
 
 **Date:** 2026-10-10
-**Status:** draft, awaiting review
+**Status:** approved and implemented
+
+**Revision (2026-10-10, during the build):** gale's LSP falls back to its
+recommended preset when it finds no config file (`gale_lsp/src/lib.rs`), so a
+rule from that preset proves nothing about which config gale read. The config
+checks use `color-named: "never"`, which only a config can turn on. The suite
+also gained `src/context.ts` (the injected gale) and `src/meta.ts` (report
+paths that plain Node can import).
 
 ## 1. Goal
 
@@ -34,7 +41,8 @@ mismatches that would otherwise fail the first run.
 - **Config files.** gale reads a config containing only
   `{"rules":{"block-no-empty":true}}` from `.stylelintrc.json`,
   `stylelint.config.mjs`, or a `"stylelint"` field in `package.json`. With no
-  config, it reports nothing.
+  config, the CLI reports nothing, but the LSP falls back to the recommended
+  preset (found during the build; see the revision note).
 - **Shutdown.** gale answers `shutdown` but exits only when stdin closes, not
   on the `exit` notification. Language clients close stdin when they stop, so
   the plugins don't notice. Fixing it belongs in gale and is out of scope here.
@@ -78,6 +86,8 @@ tools/gale-compat/
   tsconfig.json
   vitest.config.ts         *.compat.ts files, global setup, JSON report
   src/
+    context.ts             the gale under test, injected into every check
+    meta.ts                report file paths, importable by plain Node
     setup.ts               installs gale, or takes GALE_BINARY
     lsp.ts                 starts gale the way the plugins do and speaks LSP
     fixtures.ts            throwaway sample projects in temp folders
@@ -130,7 +140,8 @@ Each check gets its values from the contract instead of repeating them.
 3. **Starting the server** (`server.compat.ts`). gale starts with
    `serverArgs(settings)` and the project root as its working folder, the way
    the plugins start it. A session with `configPath: "config/gale.json"`, in a
-   project whose only config is that file, reports the rule that file turns on.
+   project whose only config is that file, reports `color-named`, the rule that
+   file turns on. The same project started without `--config` doesn't.
 4. **LSP session** (`lsp.compat.ts`). In a project with
    `gale.json` set to `{"rules":{"color-hex-length":"short"}}`:
    - `initialize` advertises `codeActionProvider` and text document sync
@@ -145,8 +156,8 @@ Each check gets its values from the contract instead of repeating them.
 5. **Config file names** (`config-files.compat.ts`). For each name in
    `facts.configFileNames`, plus `facts.packageJsonFileName` with a
    `"stylelint"` field, an LSP session runs in a fresh project holding only
-   that config, which turns on `block-no-empty`. Opening `a {}` must report
-   `block-no-empty`. Each file is written in the format its name implies:
+   that config, which turns on `color-named: "never"`. Opening
+   `a { color: red; }` must report `color-named`. Each file is written in the format its name implies:
    JSON for `.stylelintrc`, `.json`, and `package.json`; YAML for `.yml` and
    `.yaml`; TOML for `gale.toml`; `export default` for `.mjs`; and
    `module.exports` for `.js` and `.cjs`.

@@ -1,0 +1,34 @@
+{
+  "name": "gale-compat",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/gale-compat/src",
+  "projectType": "application",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "oxlint tools/gale-compat"
+      }
+    },
+    "lint-fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "oxlint --fix tools/gale-compat"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tools/gale-compat/tsconfig.json"
+      }
+    },
+    "compat": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "vitest run",
+        "cwd": "tools/gale-compat"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@gale-plugin/gale-compat",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@gale-plugin/contract": "workspace:*",
+    "vscode-jsonrpc": "9.0.3"
+  }
+}

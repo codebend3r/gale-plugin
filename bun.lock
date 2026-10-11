@@ -46,6 +46,14 @@
         "@gale-plugin/contract": "workspace:*",
       },
     },
+    "tools/gale-compat": {
+      "name": "@gale-plugin/gale-compat",
+      "version": "0.0.0",
+      "dependencies": {
+        "@gale-plugin/contract": "workspace:*",
+        "vscode-jsonrpc": "9.0.3",
+      },
+    },
   },
   "packages": {
     "@azure/abort-controller": ["@azure/abort-controller@2.2.0", "", { "dependencies": { "tslib": "^2.6.2" } }, "sha512-fNAjWnA/nZ2jz31kxR/AqRaUT8ewHBw/WuBIosK0moMy1C9e5ValbDfFdIxJzVOOYaYkV/b2F1S4H/aHiqfVQg=="],
@@ -381,6 +389,8 @@
     "@gale-plugin/codegen": ["@gale-plugin/codegen@workspace:tools/codegen"],
 
     "@gale-plugin/contract": ["@gale-plugin/contract@workspace:libs/contract"],
+
+    "@gale-plugin/gale-compat": ["@gale-plugin/gale-compat@workspace:tools/gale-compat"],
 
     "@humanfs/core": ["@humanfs/core@0.19.2", "", { "dependencies": { "@humanfs/types": "^0.15.0" } }, "sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA=="],
 

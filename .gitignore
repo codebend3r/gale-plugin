@@ -16,3 +16,6 @@ plugins/webstorm/build/
 plugins/webstorm/.gradle/
 plugins/webstorm/.intellijPlatform/
 plugins/webstorm/.kotlin/
+
+# Nightly gale compatibility reports
+tools/gale-compat/reports/
