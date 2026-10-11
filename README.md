@@ -109,6 +109,8 @@ The repo is an [Nx](https://nx.dev) workspace managed with Bun.
 - `tools/codegen` is an Nx sync generator. It writes the facts and test cases
   into Rust and Kotlin files, plus the generated parts of the VS Code manifest
   and Zed's `extension.toml`. Run `bunx nx sync` after changing the contract.
+- `tools/gale-compat` checks that a real gale still fits the contract (see
+  [Nightly gale compatibility](#nightly-gale-compatibility)).
 
 ### One-time setup
 
@@ -156,6 +158,42 @@ start Bun's own test runner and bundler.
   nothing new to push.
 
 To skip a hook once, pass `--no-verify`.
+
+### Nightly gale compatibility
+
+The plugin tests use mocks, so a new gale release could break the plugins
+without any of them failing. Every night at 07:00 UTC,
+[`gale-compat.yml`](.github/workflows/gale-compat.yml) installs the newest
+`@codebend3r/gale` from npm and runs `tools/gale-compat` against it. The suite
+drives gale through the contract every plugin shares, so a gale that passes
+fits all three plugins. It checks:
+
+- the binary sits where `projectBinaryPath` looks for it
+- gale's npm package supports the same platforms as `facts.platforms`, and
+  ships a binary for each
+- the server starts with `serverArgs`, including a relative `--config`
+- an LSP session reports diagnostics for CSS, SCSS, Less, and Sass, offers a
+  quick fix, and shuts down cleanly
+- gale reads every name in `facts.configFileNames` and the `"stylelint"` field
+  in `package.json`
+
+A failing run opens an issue labeled `gale-compat`, or comments on the one
+already open. The next passing run closes it. The workflow also runs when the
+suite or the contract changes on `main`, and by hand from the Actions tab,
+where a `gale-version` input tests a pinned release without touching the
+issue.
+
+The suite is not part of `bun system-check`, so a gale release never fails CI
+or the pre-push hook. To run it locally:
+
+```sh
+bunx nx run gale-compat:compat                       # newest gale on npm
+GALE_VERSION=0.2.5 bunx nx run gale-compat:compat    # one release
+GALE_BINARY=/path/to/gale bunx nx run gale-compat:compat   # a local build
+```
+
+`GALE_BINARY` skips the two npm package checks. After a run,
+`node tools/gale-compat/src/report.ts` prints the results as Markdown.
 
 ### Releasing
 

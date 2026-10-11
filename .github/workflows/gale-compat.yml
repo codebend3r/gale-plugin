@@ -1,0 +1,102 @@
+name: Nightly gale compatibility
+
+# Installs the newest @codebend3r/gale from npm and checks it still fits the
+# contract every plugin shares (tools/gale-compat). It lives outside ci.yml so a
+# gale release never turns CI red; failures go to one issue labeled gale-compat.
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      gale-version:
+        description: "gale version to test; blank for npm's latest. Pinned runs leave the issue alone."
+        type: string
+        default: ""
+  push:
+    branches: [main]
+    paths:
+      - "tools/gale-compat/**"
+      - "libs/contract/**"
+      - ".github/workflows/gale-compat.yml"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  compat:
+    name: gale compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      # Nx loads the TypeScript codegen plugin with Node's built-in type
+      # stripping, and the report script runs the same way.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      # Keep going on failure so the summary and the issue still get written;
+      # the last step fails the run.
+      - name: Run the compatibility suite
+        id: compat
+        continue-on-error: true
+        env:
+          GALE_VERSION: ${{ inputs.gale-version }}
+        run: bunx nx run gale-compat:compat
+
+      - name: Summarize
+        id: report
+        if: always()
+        run: |
+          node tools/gale-compat/src/report.ts > "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+          meta=tools/gale-compat/reports/meta.json
+          version=unknown
+          if [ -f "$meta" ]; then
+            version=$(jq -r '.version' "$meta")
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Open, update, or close the gale-compat issue
+        if: always() && !inputs.gale-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          OUTCOME: ${{ steps.compat.outcome }}
+          VERSION: ${{ steps.report.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          label=gale-compat
+          gh label create "$label" --force --color D93F0B \
+            --description "The nightly gale compatibility check is failing"
+          open=$(gh issue list --label "$label" --state open --json number --jq '.[0].number // empty')
+          body="$RUNNER_TEMP/issue.md"
+          { cat "$RUNNER_TEMP/report.md"; echo; echo "Run: $RUN_URL"; } > "$body"
+
+          if [ "$OUTCOME" != "success" ]; then
+            if [ -z "$open" ]; then
+              gh issue create --label "$label" --body-file "$body" \
+                --title "Nightly gale compatibility check failing (gale $VERSION)"
+            else
+              gh issue comment "$open" --body-file "$body"
+            fi
+          elif [ -n "$open" ]; then
+            gh issue comment "$open" --body "Passing again with gale $VERSION: $RUN_URL"
+            gh issue close "$open"
+          fi
+
+      - name: Fail the run when the suite failed
+        if: steps.compat.outcome != 'success'
+        run: exit 1
